@@ -1,0 +1,543 @@
+/* ==========================================================
+   Dealer Finder
+   Modern Mobile First UI
+   Author : Sumit Singh
+==========================================================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:#f5f7fb;
+
+    color:#222;
+
+    min-height:100vh;
+
+}
+
+.container{
+
+    width:95%;
+
+    max-width:700px;
+
+    margin:auto;
+
+    padding:20px 0 50px;
+
+}
+
+/* =======================================
+            HEADER
+=======================================*/
+
+.header{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.logo{
+
+    width:80px;
+
+    height:80px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:38px;
+
+    background:linear-gradient(135deg,#2E7D32,#66BB6A);
+
+    color:white;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+}
+
+.header h1{
+
+    margin-top:15px;
+
+    font-size:32px;
+
+    color:#2E7D32;
+
+}
+
+.header p{
+
+    color:#666;
+
+    margin-top:8px;
+
+}
+
+/* =======================================
+            SEARCH CARD
+=======================================*/
+
+.search-section{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.search-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    padding:14px;
+
+}
+
+.search-box i{
+
+    color:#777;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    font-size:16px;
+
+    background:none;
+
+}
+
+/* =======================================
+            BUTTONS
+=======================================*/
+
+button{
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:15px;
+
+    font-weight:600;
+
+}
+
+.primary-btn{
+
+    width:100%;
+
+    margin-top:18px;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    background:#2E7D32;
+
+    color:white;
+
+}
+
+.primary-btn:hover{
+
+    background:#256628;
+
+}
+
+.location-btn{
+
+    width:100%;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    background:#1565C0;
+
+    color:white;
+
+}
+
+.location-btn:hover{
+
+    background:#0d47a1;
+
+}
+
+.divider{
+
+    text-align:center;
+
+    margin:18px 0;
+
+    color:#888;
+
+    font-weight:600;
+
+}
+
+/* =======================================
+        LOADER
+=======================================*/
+
+.loader{
+
+    text-align:center;
+
+    margin-top:35px;
+
+}
+
+.spinner{
+
+    width:55px;
+
+    height:55px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    border:6px solid #ddd;
+
+    border-top:6px solid #2E7D32;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+/* =======================================
+            EMPTY STATE
+=======================================*/
+
+.empty-state{
+
+    text-align:center;
+
+    margin-top:60px;
+
+    color:#888;
+
+}
+
+.empty-state i{
+
+    font-size:70px;
+
+    color:#4CAF50;
+
+}
+
+.empty-state h2{
+
+    margin-top:18px;
+
+}
+
+.empty-state p{
+
+    margin-top:10px;
+
+    line-height:1.6;
+
+}
+
+/* =======================================
+            ERROR
+=======================================*/
+
+.error-box{
+
+    background:#ffebee;
+
+    color:#d32f2f;
+
+    padding:15px;
+
+    margin-top:20px;
+
+    border-radius:10px;
+
+}
+
+/* =======================================
+        DEALER CARDS
+=======================================*/
+
+.dealer-container{
+
+    margin-top:30px;
+
+}
+
+.dealer-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.dealer-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.dealer-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.dealer-name{
+
+    font-size:22px;
+
+    color:#2E7D32;
+
+    font-weight:600;
+
+}
+
+.distance-badge{
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+    padding:7px 14px;
+
+    border-radius:25px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.info{
+
+    margin-top:15px;
+
+}
+
+.info p{
+
+    margin:10px 0;
+
+    color:#555;
+
+}
+
+.info i{
+
+    width:25px;
+
+    color:#2E7D32;
+
+}
+
+/* =======================================
+        ACTION BUTTONS
+=======================================*/
+
+.actions{
+
+    margin-top:20px;
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.action-btn{
+
+    flex:1;
+
+    text-align:center;
+
+    text-decoration:none;
+
+    color:white;
+
+    padding:13px;
+
+    border-radius:10px;
+
+    transition:.3s;
+
+}
+
+.call{
+
+    background:#43A047;
+
+}
+
+.call:hover{
+
+    background:#2E7D32;
+
+}
+
+.whatsapp{
+
+    background:#25D366;
+
+}
+
+.whatsapp:hover{
+
+    background:#1da851;
+
+}
+
+.direction{
+
+    background:#1976D2;
+
+}
+
+.direction:hover{
+
+    background:#0D47A1;
+
+}
+
+/* =======================================
+            FOOTER
+=======================================*/
+
+footer{
+
+    text-align:center;
+
+    color:#777;
+
+    margin-top:50px;
+
+    padding-bottom:25px;
+
+}
+
+/* =======================================
+            MOBILE
+=======================================*/
+
+@media(max-width:600px){
+
+.header h1{
+
+    font-size:28px;
+
+}
+
+.logo{
+
+    width:70px;
+
+    height:70px;
+
+}
+
+.actions{
+
+    flex-direction:column;
+
+}
+
+.action-btn{
+
+    width:100%;
+
+}
+
+.dealer-header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.distance-badge{
+
+    margin-top:10px;
+
+}
+
+}
