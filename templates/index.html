@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find a Sahyadri Dealer</title>
+<meta name="description" content="Find your nearest Sahyadri Agro dealer by pincode or location.">
+<meta name="theme-color" content="#1F4D2C">
+<style>
+  :root{
+    --leaf:#1F4D2C;
+    --leaf-dark:#153420;
+    --soil:#6B4226;
+    --wheat:#D9A441;
+    --sage:#EFF2E9;
+    --card:#FFFFFF;
+    --ink:#22281F;
+    --ink-soft:#5B6355;
+    --line:#DDE3D5;
+    --danger:#B3261E;
+    --radius:14px;
+    --tap:48px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sage);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font:inherit;}
+
+  /* ---- header / brand ---- */
+  header{
+    background:var(--leaf);
+    color:#fff;
+    padding:14px 16px 16px;
+    position:sticky;
+    top:0;
+    z-index:5;
+    box-shadow:0 2px 8px rgba(0,0,0,.12);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .brand svg{flex:none;}
+  .brand-text{line-height:1.1;}
+  .brand-text .name{font-weight:700;font-size:17px;letter-spacing:.2px;}
+  .brand-text .tag{font-size:12px;color:#CFE0D2;}
+
+  .search-row{
+    display:flex;
+    gap:8px;
+  }
+  .search-row input{
+    flex:1;
+    min-width:0;
+    height:var(--tap);
+    border:none;
+    border-radius:10px;
+    padding:0 14px;
+    font-size:16px; /* prevents iOS zoom-on-focus */
+    background:#fff;
+    color:var(--ink);
+  }
+  .search-row input:focus{outline:3px solid var(--wheat);outline-offset:1px;}
+  .btn{
+    height:var(--tap);
+    border:none;
+    border-radius:10px;
+    padding:0 16px;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .btn-go{background:var(--wheat);color:var(--leaf-dark);}
+  .btn-go:active{transform:translateY(1px);}
+  .loc-row{margin-top:8px;}
+  .btn-loc{
+    width:100%;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.4);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-loc:active{background:rgba(255,255,255,.22);}
+
+  /* ---- status line ---- */
+  .status{
+    padding:10px 16px;
+    font-size:13px;
+    color:var(--ink-soft);
+    min-height:18px;
+  }
+  .status.error{color:var(--danger);}
+
+  /* ---- results ---- */
+  main{padding:4px 12px 32px;max-width:640px;margin:0 auto;}
+  ul.results{list-style:none;margin:0;padding:0;}
+  li.card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:10px;
+  }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:2px;
+  }
+  .dealer-name{font-weight:700;font-size:15.5px;line-height:1.3;}
+  .dealer-meta{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .distance-chip{
+    flex:none;
+    background:var(--sage);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:4px 10px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--leaf-dark);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .action{
+    flex:1;
+    height:var(--tap);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:13px;
+    font-weight:600;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .action.call{background:var(--leaf);color:#fff;border-color:var(--leaf);}
+  .action.whatsapp{background:#25D366;color:#053a1c;border-color:#25D366;}
+  .action.dir{background:var(--wheat);color:var(--leaf-dark);border-color:var(--wheat);}
+  .action:active{filter:brightness(.95);}
+  .action svg{flex:none;}
+
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--ink-soft);
+  }
+  .empty svg{margin-bottom:10px;}
+
+  .hint{font-size:12px;color:var(--ink-soft);padding:0 4px 8px;}
+
+  @media (prefers-reduced-motion:no-preference){
+    li.card{transition:transform .15s ease;}
+  }
+  @media (min-width:640px){
+    .search-row input, .btn{font-size:15px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2C7 6 4 10 4 14a8 8 0 0 0 16 0c0-4-3-8-8-12Z" fill="#D9A441"/>
+      <path d="M12 22V11" stroke="#153420" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <div class="brand-text">
+      <div class="name">Sahyadri Agro</div>
+      <div class="tag">Find your nearest dealer</div>
+    </div>
+  </div>
+
+  <form class="search-row" id="pincodeForm" autocomplete="off">
+    <input
+      type="text"
+      id="pincodeInput"
+      placeholder="Search name, mobile, pincode or place"
+      aria-label="Search by dealer name, mobile number, pincode, or location">
+    <button class="btn btn-go" type="submit">Search</button>
+  </form>
+
+  <div class="loc-row">
+    <button class="btn btn-loc" id="locBtn" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="3" fill="#fff"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Use my location instead
+    </button>
+  </div>
+</header>
+
+<div class="status" id="status" role="status" aria-live="polite">Showing all dealers — search by name, mobile, pincode, or place, or use your location to sort by distance.</div>
+
+<main>
+  <ul class="results" id="results"></ul>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- embedded dealer data (from sahyadri_dealers_sample.csv) ----
+  // Embedding avoids a second network round trip, which matters most on a slow connection.
+  var DEALERS = [
+    {name:"Sahyadri Agro Center", district:"Pune", pincode:"411001", phone:"9822010001", lat:18.5204, lon:73.8567},
+    {name:"Krishi Seva Kendra", district:"Satara", pincode:"415001", phone:"9822010002", lat:17.6805, lon:73.9938},
+    {name:"Kolhapur Agro Traders", district:"Kolhapur", pincode:"416001", phone:"9822010003", lat:16.7050, lon:74.2433},
+    {name:"Sangli Farmers Mart", district:"Sangli", pincode:"416416", phone:"9822010004", lat:16.8524, lon:74.5815},
+    {name:"Nashik Krishi Bhandar", district:"Nashik", pincode:"422001", phone:"9822010005", lat:19.9975, lon:73.7898},
+    {name:"Ahmednagar Agro Point", district:"Ahmednagar", pincode:"414001", phone:"9822010006", lat:19.0948, lon:74.7480},
+    {name:"Ratnagiri Beej Bhandar", district:"Ratnagiri", pincode:"415612", phone:"9822010007", lat:16.9902, lon:73.3120},
+    {name:"Sindhudurg Krishi Seva", district:"Sindhudurg", pincode:"416812", phone:"9822010008", lat:16.1740, lon:73.5100},
+    {name:"Raigad Agro Suppliers", district:"Raigad", pincode:"402301", phone:"9822010009", lat:18.2500, lon:73.1500},
+    {name:"Thane Farm Inputs", district:"Thane", pincode:"400601", phone:"9822010010", lat:19.2183, lon:72.9781},
+    {name:"Palghar Krishi Kendra", district:"Palghar", pincode:"401404", phone:"9822010011", lat:19.6970, lon:72.7650},
+    {name:"Solapur Agro Hub", district:"Solapur", pincode:"413001", phone:"9822010012", lat:17.6599, lon:75.9064},
+    {name:"Beed Krishi Store", district:"Beed", pincode:"431122", phone:"9822010013", lat:18.9891, lon:75.7601},
+    {name:"Latur Agro Traders", district:"Latur", pincode:"413512", phone:"9822010014", lat:18.4088, lon:76.5604},
+    {name:"Dharashiv Krishi Kendra", district:"Dharashiv", pincode:"413501", phone:"9822010015", lat:18.1860, lon:76.0419},
+    {name:"Jalgaon Farm Supplies", district:"Jalgaon", pincode:"425001", phone:"9822010016", lat:21.0077, lon:75.5626},
+    {name:"Dhule Agro Center", district:"Dhule", pincode:"424001", phone:"9822010017", lat:20.9042, lon:74.7749},
+    {name:"Sambhajinagar Krishi Bhandar", district:"Sambhajinagar", pincode:"431001", phone:"9822010018", lat:19.8762, lon:75.3433},
+    {name:"Nandurbar Agro Traders", district:"Nandurbar", pincode:"425412", phone:"9822010019", lat:21.3700, lon:74.2400},
+    {name:"Wardha Krishi Seva Kendra", district:"Wardha", pincode:"442001", phone:"9822010020", lat:20.7453, lon:78.6022}
+  ];
+
+  var CACHE_KEY = "pincodeGeocodeCache.v1";
+  var resultsEl = document.getElementById("results");
+  var statusEl = document.getElementById("status");
+  var form = document.getElementById("pincodeForm");
+  var pinInput = document.getElementById("pincodeInput");
+  var locBtn = document.getElementById("locBtn");
+
+  function haversineKm(lat1, lon1, lat2, lon2){
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+            Math.sin(dLon/2)*Math.sin(dLon/2);
+    var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  function icon(kind){
+    if(kind==="call") return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C11.6 21 3 12.4 3 2c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8Z" fill="currentColor"/></svg>';
+    if(kind==="wa") return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20Z" fill="currentColor"/><path d="M9.1 7.6c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.4.2.5.7 1.7.8 1.8.1.2.1.3 0 .5-.1.2-.2.3-.4.5-.2.2-.3.3-.1.6.2.4.9 1.4 1.9 2.2 1.3 1.1 2.4 1.5 2.7 1.6.3.2.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.7-.1.3.1 1.9.9 2.2 1 .3.2.5.2.6.4.1.2.1.9-.2 1.7-.3.8-1.7 1.6-2.3 1.6-.6 0-1.4.2-4.6-1-3.9-1.6-6.3-5.5-6.5-5.8-.2-.3-1.5-2-1.5-3.8 0-1.8 1-2.7 1.3-3Z" fill="currentColor"/></svg>';
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" fill="currentColor"/></svg>';
+  }
+
+  function render(list, originKnown){
+    resultsEl.innerHTML = "";
+    if(!list.length){
+      resultsEl.innerHTML = '<div class="empty">No dealers found near that area yet. Try a nearby pincode or call our helpline.</div>';
+      return;
+    }
+    list.forEach(function(d){
+      var li = document.createElement("li");
+      li.className = "card";
+      var distanceHtml = originKnown
+        ? '<span class="distance-chip">' + d.distance.toFixed(1) + ' km</span>'
+        : '';
+      var waText = encodeURIComponent("Hi, I'd like to know more about Sahyadri Agro products available at your store.");
+      li.innerHTML =
+        '<div class="card-top">' +
+          '<div>' +
+            '<div class="dealer-name">' + d.name + '</div>' +
+            '<div class="dealer-meta">' + d.district + ' · ' + d.pincode + '</div>' +
+          '</div>' +
+          distanceHtml +
+        '</div>' +
+        '<div class="actions">' +
+          '<a class="action call" href="tel:+91' + d.phone + '">' + icon("call") + ' Call</a>' +
+          '<a class="action whatsapp" href="https://wa.me/91' + d.phone + '?text=' + waText + '" target="_blank" rel="noopener">' + icon("wa") + ' WhatsApp</a>' +
+          '<a class="action dir" href="https://www.google.com/maps/dir/?api=1&destination=' + d.lat + ',' + d.lon + '" target="_blank" rel="noopener">' + icon("dir") + ' Directions</a>' +
+        '</div>';
+      resultsEl.appendChild(li);
+    });
+  }
+
+  var lastOrigin = null; // { lat, lon } once known, from geolocation or a resolved pincode
+
+  function withDistanceIfKnown(list){
+    if(!lastOrigin) return list;
+    return list.map(function(d){
+      return Object.assign({}, d, { distance: haversineKm(lastOrigin.lat, lastOrigin.lon, d.lat, d.lon) });
+    }).sort(function(a,b){ return a.distance - b.distance; });
+  }
+
+  function showAllUnsorted(msg){
+    render(withDistanceIfKnown(DEALERS), !!lastOrigin);
+    statusEl.className = "status";
+    statusEl.textContent = msg;
+  }
+
+  function sortAndShowByOrigin(lat, lon, label){
+    lastOrigin = { lat: lat, lon: lon };
+    var list = withDistanceIfKnown(DEALERS);
+    render(list, true);
+    statusEl.className = "status";
+    statusEl.textContent = label + " · nearest dealer first.";
+  }
+
+  function showFiltered(list, label){
+    if(!list.length){
+      render([], false);
+      statusEl.className = "status";
+      statusEl.textContent = label + " — no matches.";
+      return;
+    }
+    var sorted = withDistanceIfKnown(list);
+    render(sorted, !!lastOrigin);
+    statusEl.className = "status";
+    statusEl.textContent = label + (lastOrigin ? " · nearest first." : "");
+  }
+
+  // ---- device location ----
+  locBtn.addEventListener("click", function(){
+    if(!("geolocation" in navigator)){
+      statusEl.className = "status error";
+      statusEl.textContent = "Location isn't available on this device/browser. Try searching by pincode instead.";
+      return;
+    }
+    statusEl.className = "status";
+    statusEl.textContent = "Getting your location…";
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        sortAndShowByOrigin(pos.coords.latitude, pos.coords.longitude, "Using your current location");
+      },
+      function(err){
+        statusEl.className = "status error";
+        statusEl.textContent = err.code === 1
+          ? "Location permission denied. Enter your pincode instead."
+          : "Couldn't get your location. Enter your pincode instead.";
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+  });
+
+  // ---- pincode search ----
+  function getCache(){
+    try{ return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; }
+    catch(e){ return {}; }
+  }
+  function setCache(cache){
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }catch(e){}
+  }
+
+  function geocodePincode(pincode){
+    var cache = getCache();
+    if(cache[pincode]){
+      return Promise.resolve(cache[pincode]);
+    }
+    var url = "https://nominatim.openstreetmap.org/search?format=json&country=India&postalcode=" + encodeURIComponent(pincode);
+    return fetch(url, { headers: { "Accept": "application/json" } })
+      .then(function(r){ if(!r.ok) throw new Error("geocode failed"); return r.json(); })
+      .then(function(rows){
+        if(!rows || !rows.length) throw new Error("no match");
+        var loc = { lat: parseFloat(rows[0].lat), lon: parseFloat(rows[0].lon) };
+        cache[pincode] = loc;
+        setCache(cache);
+        return loc;
+      });
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var raw = pinInput.value.trim();
+
+    if(!raw){
+      showAllUnsorted("Showing all dealers — search by name, mobile, pincode, or place, or use your location to sort by distance.");
+      return;
+    }
+
+    // 6-digit input → treat as a pincode: sort every dealer by real distance from it.
+    if(/^\d{6}$/.test(raw)){
+      var exact = DEALERS.filter(function(d){ return d.pincode === raw; });
+      if(exact.length){
+        sortAndShowByOrigin(exact[0].lat, exact[0].lon, "Matched pincode " + raw);
+        return;
+      }
+      statusEl.className = "status";
+      statusEl.textContent = "Looking up pincode " + raw + "…";
+      geocodePincode(raw).then(function(loc){
+        sortAndShowByOrigin(loc.lat, loc.lon, "Near pincode " + raw);
+      }).catch(function(){
+        statusEl.className = "status error";
+        statusEl.textContent = "Couldn't locate that pincode right now. Showing all dealers instead — try again or use your location.";
+        showAllUnsorted("Couldn't locate that pincode right now. Showing all dealers instead — try again or use your location.");
+      });
+      return;
+    }
+
+    // Mostly digits, more than 6 → treat as a mobile number search.
+    var digitsOnly = raw.replace(/\D/g, "");
+    if(digitsOnly.length >= 4 && digitsOnly.length / raw.length > 0.6){
+      var byPhone = DEALERS.filter(function(d){ return d.phone.indexOf(digitsOnly) !== -1; });
+      showFiltered(byPhone, "Matches for \"" + raw + "\"");
+      return;
+    }
+
+    // Otherwise → free-text match against dealer name and district/location.
+    var q = raw.toLowerCase();
+    var byText = DEALERS.filter(function(d){
+      return d.name.toLowerCase().indexOf(q) !== -1 ||
+             d.district.toLowerCase().indexOf(q) !== -1;
+    });
+    showFiltered(byText, "Matches for \"" + raw + "\"");
+  });
+
+  // ---- initial render ----
+  showAllUnsorted("Showing all dealers — search a pincode or use your location to sort by distance.");
+})();
+</script>
+</body>
+</html>
