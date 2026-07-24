@@ -30,9 +30,7 @@ app.mount(
     name="static"
 )
 
-# --------------------------------------------------------
 # HTML Templates
-# --------------------------------------------------------
 
 templates = Jinja2Templates(
     directory=config.TEMPLATE_DIR
